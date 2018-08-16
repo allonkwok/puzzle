@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>puzzle</title>
+    <style>
+        html,body{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #ccc;
+        }
+        ul{
+            position: absolute;
+            padding: 20px;
+            width: 860px;
+            height: 620px;
+            top: 50%;
+            left: 50%;
+            margin: -330px 0 0 -430px;
+            background: #f0f0f0;
+            border: #ff9900 1px solid;
+            text-align: center;
+        }
+        li{
+            list-style: none;
+            float: left;
+            border: #ccc 1px solid;
+            margin: 0 20px 20px 0;
+            text-align: center;
+        }
+        li:nth-child(10),li:nth-child(20),li:nth-child(30),li:nth-child(40){
+            margin-right: 0;
+        }
+        #masker{
+            position: fixed;
+            background: #000;
+            opacity: 0.66;
+            width: 100%;
+            height: 100%;
+            /*border: #999 solid 1px;*/
+            top:0;
+        }
+        #controller{
+            padding: 10px;
+            position: fixed;
+            background: #000;
+            opacity: 0.66;
+            width: 150px;
+            height: 22px;
+            /*border: #999 solid 1px;*/
+            bottom:0;
+            right:0;
+        }
+    </style>
+    <script src="jquery-1.10.2.js"></script>
+    <script>
+        function UrlSearch()
+        {
+            var name,value;
+            var str=location.href; //取得整个地址栏
+            var num=str.indexOf("?")
+            str=str.substr(num+1); //取得所有参数   stringvar.substr(start [, length ]
+
+            var arr=str.split("&"); //各个参数放到数组里
+            for(var i=0;i < arr.length;i++){
+                num=arr[i].indexOf("=");
+                if(num>0){
+                    name=arr[i].substring(0,num);
+                    value=arr[i].substr(num+1);
+                    this[name]=value;
+                }
+            }
+        }
+        var param = new UrlSearch();
+
+        function showSource(str){
+            console.log(str);
+            $('#masker').show();
+            $('ul').show();
+            $('li').each(function (i) {
+                if(typeof($(this).find('img').attr('src'))=='undefined'){
+                    $(this).find('img').attr('src', "asset/image/source/"+$(this).find('input').val()+".jpg");
+                }
+            });
+        }
+
+        function hideSource(){
+            $('#masker').hide();
+            $('ul').hide();
+        }
+
+        function saveLayout(json) {
+            var obj = $.parseJSON(json);
+            console.log(obj);
+        }
+
+        function saveSingleLayout(json){
+            var obj = $.parseJSON(json);
+            console.log(obj);
+            return Math.ceil(Math.random()*9999);
+        }
+
+        function deleteLayout(id) {
+            console.log(id);
+        }
+
+        function thisMapMovie(movieName)
+        {
+            if (window.document[movieName])
+            {
+                return window.document[movieName];
+            }
+            if (navigator.appName.indexOf("Microsoft Internet")==-1)
+            {
+                if (document.embeds && document.embeds[movieName])
+                    return document.embeds[movieName];
+            }
+            else // if (navigator.appName.indexOf("Microsoft Internet")!=-1)
+            {
+                return document.getElementById(movieName);
+            }
+        }
+
+        $(function () {
+
+            hideSource();
+
+            $('#submitBtn').click(function () {
+                var str = "[";
+                $("input[type='checkbox']:checkbox:checked").each(function(){
+                    var id = $(this).val();
+                    var small = "asset/image/source/"+id+".jpg";
+                    var big = "asset/image/source/"+id+".jpg";
+                    str += "{\"id\":"+id+", \"small\":\""+small+"\", \"big\":\""+big+"\", \"rank\":0},";
+                });
+                str = str.substr(0, str.length-1);
+                str += "]";
+                console.log(str);
+                thisMapMovie("swf").setSourceList(str);
+                $('#masker').hide();
+                $('ul').hide();
+            });
+
+            $('#closeBtn').click(function () {
+                $('#masker').hide();
+                $('ul').hide();
+            });
+
+            $('#newBtn').click(function () {
+                thisMapMovie("swf").setLayout();
+            });
+
+            $('#editBtn').click(function () {
+                $.get('layout.json', function (data) {
+                    console.log(data);
+                    thisMapMovie("swf").setLayout(data);
+                }, 'text');
+            });
+            $('#fullScreenBtn').click(function () {
+                thisMapMovie("swf").setFullScreen();
+            });
+        });
+    </script>
+</head>
+<body>
+<object id="swf" name="swf" data="Main.swf" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=5,0,0,0" width="100%" height="100%">
+    <param name=movie value="Main.swf">
+    <param name="wmode" value="Opaque">
+    <param name="Menu" value="-1">
+    <param name="AllowScriptAccess" value="always">
+    <embed name="swf" allowScriptAccess="always" wmode="Opaque" src="Main.swf" quality="high" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash" width="100%" height="100%"></embed>
+</object>
+<div id="controller">
+    <button id="newBtn">新建</button>&nbsp;&nbsp;<button id="editBtn">编辑</button>&nbsp;&nbsp;<button id="fullScreenBtn">全屏</button>
+</div>
+<div id="masker"></div>
+<ul>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601333474" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601334336" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601335155" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601335798" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601340681" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601341283" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601342119" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601343509" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601344275" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601345026" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601350054" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601350715" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601351509" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601352136" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601352629" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601353158" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601353749" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601354330" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601354990" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601355612" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601360766" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601362189" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601362760" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601382263" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601382923" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601383260" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601383884" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601384399" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601384861" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601385507" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601390212" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601390844" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601391441" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601392174" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601392865" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601393507" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601394099" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601394770" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601395466" ></li>
+    <li><img width="66" height="100"><br><input type="checkbox" value="2017090601400084" ></li>
+    <button id="submitBtn">确定</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id="closeBtn">关闭</button>
+</ul>
+</body>
+</html>
