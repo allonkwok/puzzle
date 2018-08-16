@@ -2,7 +2,9 @@ package com.pop136.puzzle.ui {
 import com.pop136.puzzle.event.PhotoControlEvent;
 
 import flash.display.Sprite;
+import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.events.TextEvent;
 import flash.geom.Rectangle;
 
 import ui.PhotoControlMc;
@@ -14,6 +16,20 @@ public class PhotoControl extends Sprite{
     public function PhotoControl() {
 
         mc = new PhotoControlMc();
+        mc.slider.txt.restrict = "0-9";
+        mc.slider.txt.addEventListener(Event.CHANGE, function (e:Event) {
+            var percent:Number = Number(mc.slider.txt.text)/100;
+            if(percent<0){
+                percent = 0.1;
+                mc.slider.txt.text = 10;
+            }
+            if(percent>4){
+                percent = 4;
+                mc.slider.txt.text = 400;
+            }
+            mc.slider.btn.x = percent * 56.4;
+            dispatchEvent(new PhotoControlEvent(PhotoControlEvent.SLIDE, percent));
+        });
         addChild(mc);
 
         mc.dragMc.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent){
@@ -65,7 +81,7 @@ public class PhotoControl extends Sprite{
 
     public function setValue(n:Number):void{
         mc.slider.btn.x = n* 56.4;
-        mc.slider.txt.text = Math.round(n*100)+'%';
+        mc.slider.txt.text = Math.round(n*100);
     }
 
     private function onBtnDown(e:MouseEvent):void{
@@ -78,7 +94,7 @@ public class PhotoControl extends Sprite{
     private function onBtnMove(e:MouseEvent):void{
         mc.slider.btn.startDrag(false, new Rectangle(0, 0, 220, 0));
         var percent:Number = 0.1+mc.slider.btn.x / 56.4;
-        mc.slider.txt.text = Math.round(percent*100)+'%';
+        mc.slider.txt.text = Math.round(percent*100);
         dispatchEvent(new PhotoControlEvent(PhotoControlEvent.SLIDE, percent));
     }
 

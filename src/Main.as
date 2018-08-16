@@ -105,8 +105,8 @@ public class Main extends Sprite {
 //            onGetLayoutComplete(event);
 //        })
 
-//        var event:ServiceEvent = new ServiceEvent(ServiceEvent.GET_LAYOUT_COMPLETE);
-//        onGetLayoutComplete(event);
+        var event:ServiceEvent = new ServiceEvent(ServiceEvent.GET_LAYOUT_COMPLETE);
+        onGetLayoutComplete(event);
 
     }
 
