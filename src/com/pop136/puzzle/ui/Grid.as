@@ -393,6 +393,8 @@ public class Grid extends Sprite {
         link = '';
         linkType = '0';
         isLocal = false;
+        rx = 0;
+        ry = 0;
     }
 
     public function set selected(val:Boolean):void{
