@@ -613,6 +613,15 @@ public class Canvas extends Sprite {
             isHit = layerContainer.hitTestPoint(thumb.x, thumb.y);
             if(isHit){
                 var p:Point = layerContainer.globalToLocal(new Point(thumb.x, thumb.y));
+
+                if(thumb.photoWidth>Config.LAYOUT_WIDTH || thumb.photoHeight>Config.LAYOUT_HEIGHT){
+                    var rw:Number = thumb.photoWidth / Config.LAYOUT_WIDTH;
+                    var rh:Number = thumb.photoHeight / Config.LAYOUT_HEIGHT;
+                    var ratio = (rw>rh) ? rw : rh;
+                    thumb.photoWidth = thumb.photoWidth/ratio;
+                    thumb.photoHeight = thumb.photoHeight/ratio;
+                }
+
                 var data = {
                     x:p.x-thumb.photoWidth/2, y:p.y-thumb.photoHeight/2, width:thumb.photoWidth, height:thumb.photoHeight,
                     photo:{id:thumb.id, small:thumb.small, big:thumb.big, x:thumb.photoWidth/2, y:thumb.photoHeight/2, width:thumb.photoWidth, height:thumb.photoHeight, scale:1, rotation:0, brand:thumb.brand, description:thumb.description, link:thumb.link, linkType:thumb.linkType, rank:0}

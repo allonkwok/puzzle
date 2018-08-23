@@ -141,7 +141,9 @@ public class LayerList extends Sprite{
                 'asset/image/layer/4.jpg',
                 'asset/image/layer/5.png',
                 'asset/image/layer/6.png',
-                'asset/image/layer/7.png'
+                'asset/image/layer/7.png',
+                'asset/image/layer/8.jpg',
+                'asset/image/layer/9.jpg'
             ];
             for(var i:int=0;i<arr.length;i++){
                 var data = {id:i, small:arr[i], big:arr[i], brand:'brand'+i, description:'description'+i, link:'link'+i, linkType:i%2+1};
