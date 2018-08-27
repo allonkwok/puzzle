@@ -408,7 +408,7 @@ public class Main extends Sprite {
 
         var txt:TextField = new TextField();
         txt.border = true;
-        txt.text = 'v1.41';
+        txt.text = 'v1.42';
         txt.width = 80;
         txt.height = 20;
         txt.mouseEnabled = false;
