@@ -24,15 +24,15 @@ import flash.utils.ByteArray;
 
 public class ServiceManager {
 
-//    public static const SITE_URL:String = 'http://puzzle.cn/';
-//    public static const GET_TEMPLATE_URL:String = SITE_URL+'get-template.php';
-//    public static const SAVE_PHOTO:String = SITE_URL+'save-photo.php';
-//    public static const SAVE_LAYOUT_IMAGE:String = SITE_URL+'save-layout.php';
+    public static const SITE_URL:String = 'http://puzzle.cn/';
+    public static const GET_TEMPLATE_URL:String = SITE_URL+'get-template.php';
+    public static const SAVE_PHOTO:String = SITE_URL+'save-photo.php';
+    public static const SAVE_LAYOUT_IMAGE:String = SITE_URL+'save-layout.php';
 
-    public static const SITE_URL:String = 'http://www.pop-fashion.com/';
-    public static const GET_TEMPLATE_URL:String = SITE_URL+'puzzle/getPuzzleTemplates/';
-    public static const SAVE_PHOTO:String = SITE_URL+'puzzle/uploadLocalPhoto/';
-    public static const SAVE_LAYOUT_IMAGE:String = SITE_URL+'puzzle/uploadLocalPhoto/';
+//    public static const SITE_URL:String = 'http://www.pop-fashion.com/';
+//    public static const GET_TEMPLATE_URL:String = SITE_URL+'puzzle/getPuzzleTemplates/';
+//    public static const SAVE_PHOTO:String = SITE_URL+'puzzle/uploadLocalPhoto/';
+//    public static const SAVE_LAYOUT_IMAGE:String = SITE_URL+'puzzle/uploadLocalPhoto/';
 
     private static const KEY:String = 'Pop_Puzzle';
 
