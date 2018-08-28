@@ -8,7 +8,8 @@ out/
 # Other files and folders
 .settings/
 .idea/
-puzzle.iml
+*.iml
+.DS_Store
 
 # Executables
 *.swf

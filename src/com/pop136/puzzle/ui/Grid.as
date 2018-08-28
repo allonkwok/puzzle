@@ -109,6 +109,8 @@ public class Grid extends Sprite {
             this.link = data.photo.link;
             this.linkType = data.photo.linkType;
             this.isLocal = false;
+            this.rx = data.photo.rotationX;
+            this.ry = data.photo.rotationY;
             var ldr:Loader = new Loader();
             ldr.load(new URLRequest(data.photo.big));
             ldr.contentLoaderInfo.addEventListener(Event.COMPLETE, function (e:Event) {
@@ -117,7 +119,7 @@ public class Grid extends Sprite {
                 bitmap.y = -bitmap.height/2;
                 container.addChild(bitmap);
 
-                if(data.photo.rotationX==-180){
+                if(rx==-180){
 //                    bitmap.rotationX = data.photo.rotationX;
 //                    bitmap.y = bitmap.height/2;
                     var matrix:Matrix = new Matrix();
@@ -125,7 +127,7 @@ public class Grid extends Sprite {
                     matrix.ty = bitmap.bitmapData.height;
                     bitmap.bitmapData.draw(bitmap.bitmapData.clone(), matrix);
                 }
-                if(data.photo.rotationY==-180){
+                if(ry==-180){
 //                    bitmap.rotationY = data.photo.rotationY;
 //                    bitmap.x = bitmap.width/2;
                     var matrix:Matrix = new Matrix();
