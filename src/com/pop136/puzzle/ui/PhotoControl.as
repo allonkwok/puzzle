@@ -16,6 +16,16 @@ public class PhotoControl extends Sprite{
     public function PhotoControl() {
 
         mc = new PhotoControlMc();
+        addChild(mc);
+
+        mc.dragMc.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent){
+            e.target.parent.parent.startDrag();
+        });
+
+        mc.dragMc.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent){
+            e.target.parent.parent.stopDrag();
+        });
+
         mc.slider.txt.restrict = "0-9";
         mc.slider.txt.addEventListener(Event.CHANGE, function (e:Event) {
             var percent:Number = Number(mc.slider.txt.text)/100;
@@ -30,20 +40,13 @@ public class PhotoControl extends Sprite{
             mc.slider.btn.x = percent * 56.4;
             dispatchEvent(new PhotoControlEvent(PhotoControlEvent.SLIDE, percent));
         });
-        addChild(mc);
-
-        mc.dragMc.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent){
-            e.target.parent.parent.startDrag();
-        });
-
-        mc.dragMc.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent){
-            e.target.parent.parent.stopDrag();
-        });
-
         mc.slider.btn.addEventListener(MouseEvent.MOUSE_DOWN, onBtnDown);
 
-        mc.rotateBtn.addEventListener(MouseEvent.CLICK, function (e:MouseEvent) {
-            dispatchEvent(new PhotoControlEvent(PhotoControlEvent.ROTATE));
+        mc.rotateBtn.txt.restrict = "0-9\\-";
+        mc.rotateBtn.txt.addEventListener(Event.CHANGE, function (e:Event) {
+            var rotation:int = parseInt(mc.rotateBtn.txt.text);
+            trace(rotation);
+            dispatchEvent(new PhotoControlEvent(PhotoControlEvent.ROTATE, rotation));
         });
         mc.horizontalBtn.addEventListener(MouseEvent.CLICK, function (e:MouseEvent) {
             dispatchEvent(new PhotoControlEvent(PhotoControlEvent.HORIZONTAL));

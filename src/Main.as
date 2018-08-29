@@ -408,7 +408,7 @@ public class Main extends Sprite {
 
         var txt:TextField = new TextField();
         txt.border = true;
-        txt.text = 'v1.43';
+        txt.text = 'v1.44';
         txt.width = 80;
         txt.height = 20;
         txt.mouseEnabled = false;
@@ -466,12 +466,8 @@ public class Main extends Sprite {
     }
 
     private function onPhotoControlRotate(e:PhotoControlEvent):void{
-        if(canvas.grid && canvas.grid.container.numChildren>0){
-            canvas.grid.container.rotation -= 90;
-        }
-        if(canvas.layer && canvas.layer.container.numChildren>0){
-            canvas.layer.container.rotation -= 90;
-        }
+        var rotation = parseInt(e.data.toString());
+        canvas.grid.container.rotation = rotation;
     }
 
     private function onPhotoControlHorizontal(e:PhotoControlEvent):void{
