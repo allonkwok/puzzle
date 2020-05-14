@@ -99,11 +99,11 @@ public class Main extends Sprite {
         messager.addEventListener(LayoutImageEvent.DRAW_COMPLETE, onDrawComplete);
 
 
-//        var loader:URLLoader = new URLLoader(new URLRequest('layout.json'));
-//        loader.addEventListener(Event.COMPLETE, function (e:Event) {
-//            var event:ServiceEvent = new ServiceEvent(ServiceEvent.GET_LAYOUT_COMPLETE, e.target.data);
-//            onGetLayoutComplete(event);
-//        })
+        var loader:URLLoader = new URLLoader(new URLRequest('layout.json'));
+        loader.addEventListener(Event.COMPLETE, function (e:Event) {
+            var event:ServiceEvent = new ServiceEvent(ServiceEvent.GET_LAYOUT_COMPLETE, e.target.data);
+            onGetLayoutComplete(event);
+        })
 
         var event:ServiceEvent = new ServiceEvent(ServiceEvent.GET_LAYOUT_COMPLETE);
         onGetLayoutComplete(event);
