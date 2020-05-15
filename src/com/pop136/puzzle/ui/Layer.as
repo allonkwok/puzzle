@@ -41,7 +41,7 @@ public class Layer extends Sprite{
     public var link:String;
     public var linkType:String;
 
-    public var layerDragable:Boolean;
+    public var layerDragable:Boolean = true;
 
     public var rx:int = 0;
     public var ry:int = 0;

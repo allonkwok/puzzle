@@ -620,6 +620,9 @@ public class Canvas extends Sprite {
                     var ratio = (rw>rh) ? rw : rh;
                     thumb.photoWidth = thumb.photoWidth/ratio;
                     thumb.photoHeight = thumb.photoHeight/ratio;
+                    //比画布小
+                    thumb.photoWidth = thumb.photoWidth*0.66;
+                    thumb.photoHeight = thumb.photoHeight*0.66;
                 }
 
                 var data = {
@@ -639,7 +642,7 @@ public class Canvas extends Sprite {
                 }
                 l.selected = true;
                 this.layer = l;
-                dispatchEvent(new CanvasEvent(CanvasEvent.LAYER_SELECTED, {scale:1, dragable:false}));
+                dispatchEvent(new CanvasEvent(CanvasEvent.LAYER_SELECTED, {scale:1, dragable:true}));
             }
         }
     }
