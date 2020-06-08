@@ -1,6 +1,7 @@
 package com.pop136.puzzle.ui {
 import com.pop136.puzzle.Config;
 import com.pop136.puzzle.event.Messager;
+import com.pop136.puzzle.event.OperationEvent;
 import com.pop136.puzzle.event.TopBarEvent;
 import com.pop136.puzzle.manager.DataManager;
 import com.pop136.puzzle.manager.PopupManager;
@@ -17,13 +18,16 @@ import ui.SaveBtn;
 import ui.SubmitBtn;
 import ui.TabBtn;
 import ui.TabMc;
-import ui.TabMc;
+import ui.UndoBtn;
+import ui.RedoBtn;
 
 public class TopBar extends Sprite{
 
     private var submitBtn:SubmitBtn;
     private var saveBtn:SaveBtn;
     public var tabBtn:TabBtn;
+    private var undoBtn:UndoBtn;
+    public var redoBtn:RedoBtn;
     private var container:Sprite;
     private var messager:Messager = Messager.getInstance();
     private var currentTab:TabMc;
@@ -69,6 +73,16 @@ public class TopBar extends Sprite{
         saveBtn.x = submitBtn.x - saveBtn.width;
         addChild(saveBtn);
 
+        redoBtn = new RedoBtn();
+        redoBtn.x = saveBtn.x - redoBtn.width;
+        redoBtn.gotoAndStop('disabled');
+        addChild(redoBtn);
+
+        undoBtn = new UndoBtn();
+        undoBtn.x = redoBtn.x - undoBtn.width;
+        undoBtn.gotoAndStop('disabled');
+        addChild(undoBtn);
+
         stage.addEventListener(Event.RESIZE, onResize);
 
         addEventListener(MouseEvent.MOUSE_OVER, onMouseOver);
@@ -76,6 +90,9 @@ public class TopBar extends Sprite{
         addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
         addEventListener(MouseEvent.CLICK, onClick);
         messager.addEventListener(TopBarEvent.CONFIRM, onConfirm);
+        messager.addEventListener(TopBarEvent.AFTER_SAVE_OPERATION, onAfterSaveOperation);
+        messager.addEventListener(TopBarEvent.AFTER_UNDO, onAfterUndo);
+        messager.addEventListener(TopBarEvent.AFTER_REDO, onAfterRedo);
     }
 
     public function setTabName(i:int, name:String){
@@ -152,6 +169,45 @@ public class TopBar extends Sprite{
             messager.dispatchEvent(new TopBarEvent(TopBarEvent.SAVE));
         }else if(e.target==submitBtn){
             messager.dispatchEvent(new TopBarEvent(TopBarEvent.SUBMIT));
+        }else if(e.target==undoBtn || e.target.parent==undoBtn){
+            if(DataManager.undoArr.length>0){
+                messager.dispatchEvent(new OperationEvent(OperationEvent.UNDO));
+            }
+        }else if(e.target==redoBtn || e.target.parent==redoBtn){
+            if(DataManager.redoArr.length>0){
+                messager.dispatchEvent(new OperationEvent(OperationEvent.REDO));
+            }
+        }
+
+        trace(e.target==undoBtn);
+    }
+
+    private function onAfterSaveOperation(e:TopBarEvent){
+        checkUndoRedoBtn();
+    }
+
+    private function onAfterUndo(e:TopBarEvent){
+        checkUndoRedoBtn();
+    }
+
+    private function onAfterRedo(e:TopBarEvent){
+        checkUndoRedoBtn();
+    }
+
+    private function checkUndoRedoBtn(){
+        if(DataManager.undoArr.length>0){
+            undoBtn.enabled = true;
+            undoBtn.gotoAndStop('enabled');
+        }else{
+            undoBtn.enabled = false;
+            undoBtn.gotoAndStop('disabled');
+        }
+        if(DataManager.redoArr.length>0){
+            redoBtn.enabled = true;
+            redoBtn.gotoAndStop('enabled');
+        }else{
+            redoBtn.enabled = false;
+            redoBtn.gotoAndStop('disabled');
         }
     }
 

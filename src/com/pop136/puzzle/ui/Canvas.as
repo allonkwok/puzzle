@@ -3,6 +3,8 @@ import com.pop136.puzzle.Config;
 import com.pop136.puzzle.event.CanvasEvent;
 import com.pop136.puzzle.event.CommonDialogEvent;
 import com.pop136.puzzle.event.Messager;
+import com.pop136.puzzle.event.OperationEvent;
+import com.pop136.puzzle.event.TopBarEvent;
 import com.pop136.puzzle.manager.DataManager;
 
 import flash.display.MovieClip;
@@ -11,9 +13,12 @@ import flash.display.MovieClip;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.events.TimerEvent;
 import flash.geom.Point;
 import flash.geom.Point;
 import flash.geom.Rectangle;
+import flash.utils.Timer;
+import flash.utils.describeType;
 import flash.utils.setTimeout;
 
 public class Canvas extends Sprite {
@@ -56,6 +61,9 @@ public class Canvas extends Sprite {
 //        addEventListener(MouseEvent.CLICK, onClick);
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
         messager.addEventListener(CommonDialogEvent.SAVE, onCommonDialogSave);
+        messager.addEventListener(OperationEvent.SAVE_OPERATION, onSaveOperation);
+        messager.addEventListener(OperationEvent.UNDO, onUndo);
+        messager.addEventListener(OperationEvent.REDO, onRedo);
     }
 
     private function onCommonDialogSave(e:CommonDialogEvent){
@@ -64,11 +72,20 @@ public class Canvas extends Sprite {
             grid.description = e.data.description;
             grid.link = e.data.link;
             grid.linkType = e.data.linkType;
+            onSaveOperation();
         }else if(layer){
             layer.brand = e.data.brand;
             layer.description = e.data.description;
             layer.link = e.data.link;
             layer.linkType = e.data.linkType;
+            onSaveOperation();
+        }
+    }
+
+    public function getCurrent(){
+        return {
+            grids: getGrids(),
+            layers: getLayers()
         }
     }
 
@@ -206,11 +223,21 @@ public class Canvas extends Sprite {
     }
 
     private function onMouseUp(e:MouseEvent):void{
+        trace('Canvas onMouseUp');
         removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
         stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
         border = null;
+        var current = getCurrent();
+        for(var i=0; i<current.grids.length; i++){
+            var w = current.grids[i].width - DataManager.cache.grids[i].width;
+            var h = current.grids[i].height - DataManager.cache.grids[i].height;
+            if(Math.abs(w) > 1 || Math.abs(h) > 1){
+                onSaveOperation();
+                break;
+            }
+        }
     }
 
     //拖动格子大小
@@ -608,10 +635,12 @@ public class Canvas extends Sprite {
                     this.layer = null;
                 }
                 dispatchEvent(new CanvasEvent(CanvasEvent.GRID_SELECTED, 1));
+                onSaveOperation();
             }
         }else if(type==TYPE_LAYER){
             isHit = layerContainer.hitTestPoint(thumb.x, thumb.y);
             if(isHit){
+
                 var p:Point = layerContainer.globalToLocal(new Point(thumb.x, thumb.y));
 
                 if(thumb.photoWidth>Config.LAYOUT_WIDTH || thumb.photoHeight>Config.LAYOUT_HEIGHT){
@@ -643,6 +672,7 @@ public class Canvas extends Sprite {
                 l.selected = true;
                 this.layer = l;
                 dispatchEvent(new CanvasEvent(CanvasEvent.LAYER_SELECTED, {scale:1, dragable:true}));
+                onSaveOperation();
             }
         }
     }
@@ -708,6 +738,7 @@ public class Canvas extends Sprite {
             grid.dispose();
             grid = null;
             relate();
+            onSaveOperation();
         }else if(type==VERTICAL){
             trace('merge', VERTICAL);
             for(var i:int=0;i<grid.top.length;i++){
@@ -724,6 +755,7 @@ public class Canvas extends Sprite {
             grid.dispose();
             grid = null;
             relate();
+            onSaveOperation();
         }
         return true;
     }
@@ -766,13 +798,43 @@ public class Canvas extends Sprite {
         }
     }
 
+    private var timer:Timer = new Timer(100);
+    private var n = 0;
+    private var arr = [];
+    private var len = 0;
     private function onGridScale(e:CanvasEvent):void{
-        trace(e.data)
+        trace('Canvas.onGridScale:', e.data);
+        if(!timer.hasEventListener(TimerEvent.TIMER)){
+            timer.addEventListener(TimerEvent.TIMER, onTimer);
+            timer.start();
+        }
+        arr.push(e.data);
+        len = arr.length;
         dispatchEvent(new CanvasEvent(CanvasEvent.GRID_SCALE, e.data));
+    }
+
+    private function onTimer(e:TimerEvent){
+        trace('onTimer');
+        if(n>=5 && len==arr.length){
+            trace('onTimer onSaveOperation');
+            onSaveOperation();
+            timer.stop();
+            timer.removeEventListener(TimerEvent.TIMER, onTimer);
+            n = 0;
+            arr.length = 0;
+            len = 0;
+        }
+        n++;
     }
 
     private function onLayerScale(e:CanvasEvent):void{
         trace(e.data)
+        if(!timer.hasEventListener(TimerEvent.TIMER)){
+            timer.addEventListener(TimerEvent.TIMER, onTimer);
+            timer.start();
+        }
+        arr.push(e.data);
+        len = arr.length;
         dispatchEvent(new CanvasEvent(CanvasEvent.LAYER_SCALE, e.data));
     }
 
@@ -819,6 +881,95 @@ public class Canvas extends Sprite {
 
         dispatchEvent(new CanvasEvent(CanvasEvent.SCALE, s));
 
+    }
+
+
+    public function onSaveOperation(e:OperationEvent=null){
+        DataManager.redoArr.length = 0;
+        if(DataManager.undoArr.length>=DataManager.MAX){
+            DataManager.undoArr.shift();
+        }
+        var cache;
+        if(e && e.data){
+            cache = e.data;
+        }else{
+            cache = DataManager.cache;
+        }
+        DataManager.undoArr.push(cache);
+        DataManager.cache = this.getCurrent();
+        messager.dispatchEvent(new TopBarEvent(TopBarEvent.AFTER_SAVE_OPERATION));
+        trace('---------- onSaveOperation ----------');
+        trace('DataManager.undoArr:', DataManager.undoArr);
+        trace('DataManager.cache:', DataManager.cache);
+        trace('DataManager.redoArr:', DataManager.redoArr);
+    }
+
+    private function onUndo(e:OperationEvent){
+        if(DataManager.undoArr.length>0){
+            if(DataManager.redoArr.length>=DataManager.MAX){
+                DataManager.redoArr.shift();
+            }
+            var cache = DataManager.cache;
+            DataManager.redoArr.push(cache);
+
+            var data = DataManager.undoArr.pop();
+            this.apply(data);
+            DataManager.cache = data;
+            messager.dispatchEvent(new TopBarEvent(TopBarEvent.AFTER_UNDO));
+            trace('---------- onUndo ----------');
+            trace('DataManager.undoArr:', DataManager.undoArr);
+            trace('DataManager.cache:', DataManager.cache);
+            trace('DataManager.redoArr:', DataManager.redoArr);
+            trace('layerContainer.numChildren:', layerContainer.numChildren);
+            for(var i=0; i<data.layers.length; i++){
+                for(var key in data.layers[i]){
+                    trace(key, data.layers[i][key]);
+                }
+            }
+//            var xml:XML = describeType(data);
+//            trace(xml.toXMLString());
+        }
+    }
+
+    private function onRedo(e:OperationEvent){
+        if(DataManager.redoArr.length>0){
+            if(DataManager.undoArr.length>=DataManager.MAX){
+                DataManager.undoArr.shift();
+            }
+            var cache = DataManager.cache;
+            DataManager.undoArr.push(cache);
+
+            var data = DataManager.redoArr.pop();
+            this.apply(data);
+            DataManager.cache = data;
+            messager.dispatchEvent(new TopBarEvent(TopBarEvent.AFTER_REDO));
+            trace('---------- onRedo ----------');
+            trace('DataManager.undoArr:', DataManager.undoArr);
+            trace('DataManager.cache:', DataManager.cache);
+            trace('DataManager.redoArr:', DataManager.redoArr);
+            trace('layerContainer.numChildren:', layerContainer.numChildren);
+            for(var i=0; i<data.layers.length; i++){
+                for(var key in data.layers[i]){
+                    trace(key, data.layers[i][key]);
+                }
+            }
+//            var xml:XML = describeType(data);
+//            trace(xml.toXMLString());
+        }
+    }
+
+
+    public function apply(data){
+
+        setGrid(data.grids);
+        if(data.grids && data.grids.length>0){
+        }
+
+        setLayer(data.layers);
+        if(data.layers && data.layers.length>0){
+        }
+
+        messager.dispatchEvent(new OperationEvent(OperationEvent.APPLY));
     }
 
 }

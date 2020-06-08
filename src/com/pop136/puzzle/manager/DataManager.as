@@ -13,6 +13,11 @@ public class DataManager {
 
     public static var viewRect:Rectangle;
 
+    public static const MAX = 10;
+    public static var undoArr = [];
+    public static var redoArr = [];
+    public static var cache = {grids:[], layers:[]};
+
     public static function getLayout(tmpid:int){
         trace(layouts.length);
         var obj;

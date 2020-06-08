@@ -7,10 +7,12 @@ import com.pop136.puzzle.event.CanvasControlEvent;
 import com.pop136.puzzle.event.CanvasEvent;
 import com.pop136.puzzle.event.LayoutImageEvent;
 import com.pop136.puzzle.event.Messager;
+import com.pop136.puzzle.event.OperationEvent;
 import com.pop136.puzzle.event.PhotoControlEvent;
 import com.pop136.puzzle.event.ServiceEvent;
 import com.pop136.puzzle.event.TemplateListEvent;
 import com.pop136.puzzle.event.TopBarEvent;
+import com.pop136.puzzle.manager.DataManager;
 import com.pop136.puzzle.manager.DataManager;
 import com.pop136.puzzle.manager.DragManager;
 import com.pop136.puzzle.manager.PopupManager;
@@ -97,17 +99,23 @@ public class Main extends Sprite {
         messager.addEventListener(ServiceEvent.SET_FULL_SCREEN, setFullScreen);
         messager.addEventListener(ServiceEvent.SAVE_LAYOUT_IMAGE_COMPLETE, onSaveLayoutImageComplete);
         messager.addEventListener(LayoutImageEvent.DRAW_COMPLETE, onDrawComplete);
+        messager.addEventListener(OperationEvent.APPLY, onApply);
 
-
-        var loader:URLLoader = new URLLoader(new URLRequest('layout.json'));
-        loader.addEventListener(Event.COMPLETE, function (e:Event) {
-            var event:ServiceEvent = new ServiceEvent(ServiceEvent.GET_LAYOUT_COMPLETE, e.target.data);
-            onGetLayoutComplete(event);
-        })
+//        var loader:URLLoader = new URLLoader(new URLRequest('layout.json'));
+//        loader.addEventListener(Event.COMPLETE, function (e:Event) {
+//            var event:ServiceEvent = new ServiceEvent(ServiceEvent.GET_LAYOUT_COMPLETE, e.target.data);
+//            onGetLayoutComplete(event);
+//        })
 
         var event:ServiceEvent = new ServiceEvent(ServiceEvent.GET_LAYOUT_COMPLETE);
         onGetLayoutComplete(event);
 
+    }
+
+    private function onApply(e:OperationEvent){
+        mergeMc.subMc.visible = false;
+        mergeMc.visible = false;
+        photoControl.resetDragBtn();
     }
 
     private function setFullScreen(e:ServiceEvent):void{
@@ -123,6 +131,7 @@ public class Main extends Sprite {
     private function onGetLayoutComplete(e:ServiceEvent):void{
         layoutData = e.data;
         ServiceManager.getTemplate();
+//        DataManager.cache = canvas.getCurrent();
     }
 
     private function onTabSelect(e:TopBarEvent):void{
@@ -466,8 +475,11 @@ public class Main extends Sprite {
     }
 
     private function onPhotoControlRotate(e:PhotoControlEvent):void{
-        var rotation = parseInt(e.data.toString());
-        canvas.grid.container.rotation = rotation;
+        if(canvas.grid && canvas.grid.container){
+            var rotation = parseInt(e.data.toString());
+            canvas.grid.container.rotation = rotation;
+            canvas.onSaveOperation();
+        }
     }
 
     private function onPhotoControlHorizontal(e:PhotoControlEvent):void{
@@ -492,6 +504,7 @@ public class Main extends Sprite {
             matrix.a = -1;
             matrix.tx = bmp.bitmapData.width;
             bmp.bitmapData.draw(bmp.bitmapData.clone(), matrix);
+            canvas.onSaveOperation();
         }
     }
 
@@ -517,6 +530,7 @@ public class Main extends Sprite {
             matrix.d = -1;
             matrix.ty = bmp.bitmapData.height;
             bmp.bitmapData.draw(bmp.bitmapData.clone(), matrix);
+            canvas.onSaveOperation();
         }
     }
 
@@ -545,11 +559,16 @@ public class Main extends Sprite {
     private function onPhotoControlDelete(e:PhotoControlEvent):void{
         if(canvas.grid && canvas.grid.container.numChildren>0){
             canvas.grid.reset();
+            canvas.onSaveOperation();
         }
         if(canvas.layer && canvas.layer.container.numChildren>0){
             canvas.layerContainer.removeChild(canvas.layer);
             canvas.layer.dispose();
             canvas.layer = null;
+            canvas.onSaveOperation();
+            if(canvas.layerContainer.numChildren==0){
+                photoControl.resetDragBtn();
+            }
         }
     }
 
@@ -636,6 +655,7 @@ public class Main extends Sprite {
             trace(JSON.stringify(DataManager.templates[DataManager.templateIndex].grids));
             DataManager.getLayout(DataManager.layoutTmpId).grids = arr;
             mergeMc.visible = false;
+            canvas.onSaveOperation();
         });
     }
 

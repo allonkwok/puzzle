@@ -1,4 +1,6 @@
 package com.pop136.puzzle.ui {
+import com.pop136.puzzle.event.Messager;
+import com.pop136.puzzle.event.OperationEvent;
 import com.pop136.puzzle.event.PhotoControlEvent;
 
 import flash.display.Sprite;
@@ -12,6 +14,8 @@ import ui.PhotoControlMc;
 public class PhotoControl extends Sprite{
 
     private var mc:PhotoControlMc;
+
+    private var messager:Messager = Messager.getInstance();
 
     public function PhotoControl() {
 
@@ -71,6 +75,10 @@ public class PhotoControl extends Sprite{
 
     }
 
+    public function resetDragBtn(){
+        mc.dragBtn.gotoAndStop('default');
+    }
+
     public function showSelect(){
         mc.selectBtn.visible = true;
         mc.dragBtn.visible = false;
@@ -107,6 +115,7 @@ public class PhotoControl extends Sprite{
         mc.slider.btn.removeEventListener(MouseEvent.MOUSE_UP, onBtnUp);
         mc.slider.btn.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onBtnMove);
         mc.slider.btn.stage.removeEventListener(MouseEvent.MOUSE_UP, onBtnUp);
+        messager.dispatchEvent(new OperationEvent(OperationEvent.SAVE_OPERATION));
     }
 
 }

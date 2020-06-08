@@ -1,6 +1,8 @@
 package com.pop136.puzzle.ui {
 import com.pop136.puzzle.Config;
 import com.pop136.puzzle.event.CanvasEvent;
+import com.pop136.puzzle.event.Messager;
+import com.pop136.puzzle.event.OperationEvent;
 import com.pop136.puzzle.manager.DragManager;
 import com.pop136.puzzle.manager.PopupManager;
 import com.pop136.puzzle.manager.ServiceManager;
@@ -64,6 +66,11 @@ public class Grid extends Sprite {
 
     private var dragging:Boolean = false;
     private var isNew:Boolean = false;  //新的本地图片，而非交换来，保存图片用
+
+    private var messager:Messager = Messager.getInstance();
+
+    private var oldPoint = new Point();
+
 
     public function Grid(data:Object) {
 
@@ -221,20 +228,29 @@ public class Grid extends Sprite {
     }
 
     private function onAddedToStage(e:Event):void{
+        trace('Grid onAddedToStage:', this.name);
         container.addEventListener(MouseEvent.MOUSE_DOWN, onContainerDown);
         container.addEventListener(MouseEvent.MOUSE_UP, onContainerUp);
         container.stage.addEventListener(MouseEvent.MOUSE_UP, onContainerUp);
     }
 
     private function onContainerDown(e:MouseEvent):void{
+        trace('onContainerDown:', this.name, e.target.name, e.currentTarget.name);
         container.startDrag();
         dragging = true;
+        oldPoint.x = container.x;
+        oldPoint.y = container.y;
     }
 
     private function onContainerUp(e:MouseEvent):void{
+        trace('onContainerUp:', this.name, e.target.name, e.currentTarget.name);
         if(container)
             container.stopDrag();
         dragging = false;
+        if(e.currentTarget.name=='container' && (container.x!=oldPoint.x || container.y!=oldPoint.y)){
+            trace('OperationEvent.SAVE_OPERATION');
+            messager.dispatchEvent(new OperationEvent(OperationEvent.SAVE_OPERATION));
+        }
     }
 
     private function onMouseOver(e:MouseEvent):void{
@@ -451,6 +467,7 @@ public class Grid extends Sprite {
     private function onComplete(e:Event):void{
         fr.removeEventListener(Event.COMPLETE, onComplete);
         loader.loadBytes(e.target.data);
+        messager.dispatchEvent(new OperationEvent(OperationEvent.SAVE_OPERATION));
     }
 
     private function onLoaderComplete(e:Event):void{

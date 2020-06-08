@@ -1,6 +1,8 @@
 package com.pop136.puzzle.ui {
 import com.pop136.puzzle.Config;
 import com.pop136.puzzle.event.CanvasEvent;
+import com.pop136.puzzle.event.Messager;
+import com.pop136.puzzle.event.OperationEvent;
 import com.pop136.puzzle.manager.DragManager;
 
 import flash.display.Bitmap;
@@ -8,6 +10,7 @@ import flash.display.Loader;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.geom.Matrix;
 import flash.net.URLRequest;
@@ -47,6 +50,11 @@ public class Layer extends Sprite{
     public var ry:int = 0;
 
     public var data;
+
+    private var messager:Messager = Messager.getInstance();
+    private var thisPoint = new Point();
+    private var containerPoint = new Point();
+    private var dotPoint = new Point();
 
     public function Layer(data) {
 
@@ -157,6 +165,10 @@ public class Layer extends Sprite{
     }
 
     private function onMouseDown(e:MouseEvent):void{
+        thisPoint.x = this.x;
+        thisPoint.y = this.y;
+        containerPoint.x = container.x;
+        containerPoint.y = container.y;
         if(layerDragable){
             this.startDrag();
         }
@@ -176,6 +188,8 @@ public class Layer extends Sprite{
                 rectangle = new Rectangle(-1000, mlDot.y, 2000, 0);
             }
             dot.startDrag(false, rectangle);
+            dotPoint.x = dot.x;
+            dotPoint.y = dot.y;
         }
         trace('layer onMouseDown:', this.x, this.y);
         addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
@@ -195,8 +209,14 @@ public class Layer extends Sprite{
     }
 
     private function onMouseUp(e:MouseEvent):void{
+        trace('Layer onMouseUp');
         this.stopDrag();
         container.stopDrag();
+
+        var thisMoved = Math.abs(this.x - thisPoint.x) > 1 || Math.abs(this.y - thisPoint.y) > 1;
+        var containerMoved = Math.abs(container.x - containerPoint.x) > 1 || Math.abs(container.y - containerPoint.y) > 1;
+        var dotMoved = false;
+
         if(dot){
             var w:int = Math.abs(tlDot.x - brDot.x);
             var h:int = Math.abs(tlDot.y - brDot.y);
@@ -220,12 +240,16 @@ public class Layer extends Sprite{
             mlDot.y = mrDot.y = h/2;
             blDot.y = bmDot.y = brDot.y = h;
             dot.stopDrag();
+            dotMoved = Math.abs(dot.x - dotPoint.x) > 1 || Math.abs(dot.y - dotPoint.y) > 1;
             dot = null;
         }
         removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
         stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+        if(thisMoved || containerMoved || dotMoved){
+            messager.dispatchEvent(new OperationEvent(OperationEvent.SAVE_OPERATION));
+        }
     }
 
     private function onMouseOut(e:MouseEvent):void{

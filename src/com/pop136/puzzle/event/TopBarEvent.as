@@ -7,6 +7,9 @@ public class TopBarEvent extends Event {
     public static const SAVE:String = 'save';
     public static const SUBMIT:String = 'submit';
     public static const CONFIRM:String = 'layoutDeleteConfirm';
+    public static const AFTER_SAVE_OPERATION = 'afterSaveOperation';
+    public static const AFTER_UNDO = 'AFTER_UNDO';
+    public static const AFTER_REDO = 'AFTER_REDO';
 
     /**事件数据*/
     public var data:Object = null;

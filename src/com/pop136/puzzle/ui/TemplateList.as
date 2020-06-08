@@ -1,6 +1,7 @@
 package com.pop136.puzzle.ui {
 import com.pop136.puzzle.Config;
 import com.pop136.puzzle.event.Messager;
+import com.pop136.puzzle.event.OperationEvent;
 import com.pop136.puzzle.event.TemplateListEvent;
 import com.pop136.puzzle.manager.DataManager;
 import com.pop136.puzzle.manager.PopupManager;
@@ -17,6 +18,7 @@ import flash.geom.Rectangle;
 import flash.net.URLRequest;
 import flash.system.LoaderContext;
 import flash.utils.ByteArray;
+import flash.utils.setTimeout;
 
 public class TemplateList extends Sprite{
 
