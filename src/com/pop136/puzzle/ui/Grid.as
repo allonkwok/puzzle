@@ -494,6 +494,7 @@ public class Grid extends Sprite {
     }
 
     public function dispose(){
+        this.selected = false;
         top.length = right.length = bottom.length = left.length = 0;
         top = null;
         right = null;

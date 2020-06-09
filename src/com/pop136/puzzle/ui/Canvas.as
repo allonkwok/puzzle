@@ -127,9 +127,13 @@ public class Canvas extends Sprite {
     }
 
     public function getLayers():Array{
+        trace('---------- getLayers ----------');
+        trace('layerContainer.numChildren:', layerContainer.numChildren);
         var arr:Array = [];
         for(var i:int=0;i<layerContainer.numChildren;i++){
             var layer = layerContainer.getChildAt(i);
+            trace('layer.masker.width:', layer.masker.width, 'layer.masker.height:', layer.masker.height);
+            trace('layer.container.width:', layer.container.width, 'layer.masker.height:', layer.container.height);
             var obj = {
                 x:layer.x,
                 y:layer.y,
@@ -574,10 +578,12 @@ public class Canvas extends Sprite {
     public function setLayer(arr:Array):void{
         if(this.grid){
             this.grid.selected = false;
+            this.grid.dispose();
             this.grid = null;
         }
         if(this.layer){
             this.layer.selected = false;
+            this.layer.dispose();
             this.layer = null;
         }
         for(var i:int=0,n=layerContainer.numChildren;i<n;i++){
@@ -586,11 +592,14 @@ public class Canvas extends Sprite {
             o = null;
         }
         for(var i:int=0;i<arr.length;i++){
-            layerContainer.addChild(new Layer(arr[i]));
+            var l = new Layer(arr[i]);
+            l.addEventListener(CanvasEvent.LAYER_SCALE, onLayerScale);
+            layerContainer.addChild(l);
         }
     }
 
     public function thumbHitTest(thumb:MovieClip, type:String){
+        trace('---------- thumbHitTest ----------');
         var isHit:Boolean;
         var g:Grid;
         var l:Layer;
@@ -640,8 +649,9 @@ public class Canvas extends Sprite {
         }else if(type==TYPE_LAYER){
             isHit = layerContainer.hitTestPoint(thumb.x, thumb.y);
             if(isHit){
-
-                var p:Point = layerContainer.globalToLocal(new Point(thumb.x, thumb.y));
+                var op:Point = new Point(thumb.x, thumb.y);
+                var p:Point = layerContainer.globalToLocal(op);
+                trace('op:', op, 'p:', p);
 
                 if(thumb.photoWidth>Config.LAYOUT_WIDTH || thumb.photoHeight>Config.LAYOUT_HEIGHT){
                     var rw:Number = thumb.photoWidth / Config.LAYOUT_WIDTH;
@@ -659,9 +669,11 @@ public class Canvas extends Sprite {
                     photo:{id:thumb.id, small:thumb.small, big:thumb.big, x:thumb.photoWidth/2, y:thumb.photoHeight/2, width:thumb.photoWidth, height:thumb.photoHeight, scale:1, rotation:0, brand:thumb.brand, description:thumb.description, link:thumb.link, linkType:thumb.linkType, rank:0}
                 };
                 trace('layer thumb', thumb.photoWidth, thumb.photoHeight);
+                trace('layerContainer.numChildren:', layerContainer.numChildren);
                 l = new Layer(data);
                 l.addEventListener(CanvasEvent.LAYER_SCALE, onLayerScale);
                 layerContainer.addChild(l);
+                trace('thumbHitTest l.x:', l.x, 'l.y:', l.y);
                 if(this.grid){
                     this.grid.selected = false;
                     this.grid = null;
@@ -672,7 +684,9 @@ public class Canvas extends Sprite {
                 l.selected = true;
                 this.layer = l;
                 dispatchEvent(new CanvasEvent(CanvasEvent.LAYER_SELECTED, {scale:1, dragable:true}));
-                onSaveOperation();
+                setTimeout(function () {
+                    onSaveOperation();
+                }, 100);
             }
         }
     }
@@ -902,6 +916,12 @@ public class Canvas extends Sprite {
         trace('DataManager.undoArr:', DataManager.undoArr);
         trace('DataManager.cache:', DataManager.cache);
         trace('DataManager.redoArr:', DataManager.redoArr);
+        for(var i=0; i<DataManager.cache.layers.length; i++){
+            for(var key in DataManager.cache.layers[i]){
+                trace(key, DataManager.cache.layers[i][key]);
+            }
+        }
+
     }
 
     private function onUndo(e:OperationEvent){

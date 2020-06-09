@@ -62,6 +62,8 @@ public class Layer extends Sprite{
 
         this.x = data.x;
         this.y = data.y;
+//        this.x = 0;
+//        this.y = 0;
 
         container = new Sprite();
         addChild(container);
@@ -106,9 +108,11 @@ public class Layer extends Sprite{
                 }
 
 //                self.graphics.lineStyle(5, Config.RED);
-                self.graphics.beginFill(0xffffff, 0);
+//                self.graphics.clear();
+                self.graphics.beginFill(0xffffff, 0.5);
                 self.graphics.drawRect(0, 0, data.width, data.height);
                 self.graphics.endFill();
+//                masker.graphics.clear();
                 masker.graphics.beginFill(0xffffff);
                 masker.graphics.drawRect(0, 0, data.width, data.height);
                 masker.graphics.endFill();
