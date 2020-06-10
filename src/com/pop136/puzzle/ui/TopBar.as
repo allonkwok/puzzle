@@ -12,6 +12,7 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.ui.Mouse;
 import flash.ui.MouseCursor;
+import flash.utils.setTimeout;
 
 import ui.SaveBtn;
 
@@ -128,6 +129,10 @@ public class TopBar extends Sprite{
             t.gotoAndStop("active");
             messager.dispatchEvent(new TopBarEvent(TopBarEvent.SELECT, t.tmpid));
 
+            setTimeout(function () {
+                checkUndoRedoBtn();
+            }, 500);
+
         }else if(e.target==tabBtn){
             trace("tabBtn");
             var tmpid:int = TabMc(container.getChildAt(container.numChildren-1)).tmpid + 1;
@@ -156,10 +161,19 @@ public class TopBar extends Sprite{
                 grids:[],
                 gridSources:[],
                 layers:[],
-                layerSources:[]
+                layerSources:[],
+                action:{
+                    undoArr:[],
+                    redoArr:[],
+                    cache:{
+                        grids:[],
+                        layers:[]
+                    }
+                }
             };
             DataManager.layouts.push(obj);
             messager.dispatchEvent(new TopBarEvent(TopBarEvent.SELECT, tab.tmpid));
+            checkUndoRedoBtn();
 
         }else if(e.target.parent.name.indexOf("tab")>=0 && e.target.name=="btn"){
             trace("del");
@@ -170,11 +184,13 @@ public class TopBar extends Sprite{
         }else if(e.target==submitBtn){
             messager.dispatchEvent(new TopBarEvent(TopBarEvent.SUBMIT));
         }else if(e.target==undoBtn || e.target.parent==undoBtn){
-            if(DataManager.undoArr.length>0){
+            var layout = DataManager.getLayout(DataManager.layoutTmpId);
+            if(layout.action.undoArr.length>0){
                 messager.dispatchEvent(new OperationEvent(OperationEvent.UNDO));
             }
         }else if(e.target==redoBtn || e.target.parent==redoBtn){
-            if(DataManager.redoArr.length>0){
+            var layout = DataManager.getLayout(DataManager.layoutTmpId);
+            if(layout.action.redoArr.length>0){
                 messager.dispatchEvent(new OperationEvent(OperationEvent.REDO));
             }
         }
@@ -195,14 +211,17 @@ public class TopBar extends Sprite{
     }
 
     private function checkUndoRedoBtn(){
-        if(DataManager.undoArr.length>0){
+
+        var layout = DataManager.getLayout(DataManager.layoutTmpId);
+
+        if(layout.action.undoArr.length>0){
             undoBtn.enabled = true;
             undoBtn.gotoAndStop('enabled');
         }else{
             undoBtn.enabled = false;
             undoBtn.gotoAndStop('disabled');
         }
-        if(DataManager.redoArr.length>0){
+        if(layout.action.redoArr.length>0){
             redoBtn.enabled = true;
             redoBtn.gotoAndStop('enabled');
         }else{

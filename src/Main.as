@@ -131,7 +131,6 @@ public class Main extends Sprite {
     private function onGetLayoutComplete(e:ServiceEvent):void{
         layoutData = e.data;
         ServiceManager.getTemplate();
-//        DataManager.cache = canvas.getCurrent();
     }
 
     private function onTabSelect(e:TopBarEvent):void{
@@ -629,12 +628,28 @@ public class Main extends Sprite {
                     grids:[],
                     gridSources:[],
                     layers:[],
-                    layerSources:[]
+                    layerSources:[],
+                    action:{
+                        undoArr:[],
+                        redoArr:[],
+                        cache:{
+                            grids:[],
+                            layers:[]
+                        }
+                    }
                 };
                 DataManager.layouts.push(obj);
                 DataManager.layoutTmpId = 1;
             }else{
                 var obj = JSON.parse(layoutData);
+                obj.action = {
+                    undoArr:[],
+                    redoArr:[],
+                    cache:{
+                        grids:[],
+                        layers:[]
+                    }
+                }
                 obj.tmpid = 1;
                 DataManager.layouts.push(obj);
                 DataManager.layoutTmpId = 1;

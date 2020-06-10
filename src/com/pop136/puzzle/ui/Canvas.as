@@ -233,10 +233,11 @@ public class Canvas extends Sprite {
         stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
         border = null;
+        var layout = DataManager.getLayout(DataManager.layoutTmpId);
         var current = getCurrent();
         for(var i=0; i<current.grids.length; i++){
-            var w = current.grids[i].width - DataManager.cache.grids[i].width;
-            var h = current.grids[i].height - DataManager.cache.grids[i].height;
+            var w = current.grids[i].width - layout.action.cache.grids[i].width;
+            var h = current.grids[i].height - layout.action.cache.grids[i].height;
             if(Math.abs(w) > 1 || Math.abs(h) > 1){
                 onSaveOperation();
                 break;
@@ -899,47 +900,53 @@ public class Canvas extends Sprite {
 
 
     public function onSaveOperation(e:OperationEvent=null){
-        DataManager.redoArr.length = 0;
-        if(DataManager.undoArr.length>=DataManager.MAX){
-            DataManager.undoArr.shift();
+
+        var layout = DataManager.getLayout(DataManager.layoutTmpId);
+
+        layout.action.redoArr.length = 0;
+        if(layout.action.undoArr.length>=DataManager.MAX){
+            layout.action.undoArr.shift();
         }
         var cache;
         if(e && e.data){
             cache = e.data;
         }else{
-            cache = DataManager.cache;
+            cache = layout.action.cache;
         }
-        DataManager.undoArr.push(cache);
-        DataManager.cache = this.getCurrent();
+        layout.action.undoArr.push(cache);
+        layout.action.cache = this.getCurrent();
         messager.dispatchEvent(new TopBarEvent(TopBarEvent.AFTER_SAVE_OPERATION));
         trace('---------- onSaveOperation ----------');
-        trace('DataManager.undoArr:', DataManager.undoArr);
-        trace('DataManager.cache:', DataManager.cache);
-        trace('DataManager.redoArr:', DataManager.redoArr);
-        for(var i=0; i<DataManager.cache.layers.length; i++){
-            for(var key in DataManager.cache.layers[i]){
-                trace(key, DataManager.cache.layers[i][key]);
+        trace('layout.action.undoArr:', layout.action.undoArr);
+        trace('layout.action.cache:', layout.action.cache);
+        trace('layout.action.redoArr:', layout.action.redoArr);
+        for(var i=0; i<layout.action.cache.layers.length; i++){
+            for(var key in layout.action.cache.layers[i]){
+                trace(key, layout.action.cache.layers[i][key]);
             }
         }
 
     }
 
     private function onUndo(e:OperationEvent){
-        if(DataManager.undoArr.length>0){
-            if(DataManager.redoArr.length>=DataManager.MAX){
-                DataManager.redoArr.shift();
-            }
-            var cache = DataManager.cache;
-            DataManager.redoArr.push(cache);
 
-            var data = DataManager.undoArr.pop();
+        var layout = DataManager.getLayout(DataManager.layoutTmpId);
+
+        if(layout.action.undoArr.length>0){
+            if(layout.action.redoArr.length>=DataManager.MAX){
+                layout.action.redoArr.shift();
+            }
+            var cache = layout.action.cache;
+            layout.action.redoArr.push(cache);
+
+            var data = layout.action.undoArr.pop();
             this.apply(data);
-            DataManager.cache = data;
+            layout.action.cache = data;
             messager.dispatchEvent(new TopBarEvent(TopBarEvent.AFTER_UNDO));
             trace('---------- onUndo ----------');
-            trace('DataManager.undoArr:', DataManager.undoArr);
-            trace('DataManager.cache:', DataManager.cache);
-            trace('DataManager.redoArr:', DataManager.redoArr);
+            trace('layout.action.undoArr:', layout.action.undoArr);
+            trace('layout.action.cache:', layout.action.cache);
+            trace('layout.action.redoArr:', layout.action.redoArr);
             trace('layerContainer.numChildren:', layerContainer.numChildren);
             for(var i=0; i<data.layers.length; i++){
                 for(var key in data.layers[i]){
@@ -952,21 +959,24 @@ public class Canvas extends Sprite {
     }
 
     private function onRedo(e:OperationEvent){
-        if(DataManager.redoArr.length>0){
-            if(DataManager.undoArr.length>=DataManager.MAX){
-                DataManager.undoArr.shift();
-            }
-            var cache = DataManager.cache;
-            DataManager.undoArr.push(cache);
 
-            var data = DataManager.redoArr.pop();
+        var layout = DataManager.getLayout(DataManager.layoutTmpId);
+
+        if(layout.action.redoArr.length>0){
+            if(layout.action.undoArr.length>=DataManager.MAX){
+                layout.action.undoArr.shift();
+            }
+            var cache = layout.action.cache;
+            layout.action.undoArr.push(cache);
+
+            var data = layout.action.redoArr.pop();
             this.apply(data);
-            DataManager.cache = data;
+            layout.action.cache = data;
             messager.dispatchEvent(new TopBarEvent(TopBarEvent.AFTER_REDO));
             trace('---------- onRedo ----------');
-            trace('DataManager.undoArr:', DataManager.undoArr);
-            trace('DataManager.cache:', DataManager.cache);
-            trace('DataManager.redoArr:', DataManager.redoArr);
+            trace('layout.action.undoArr:', layout.action.undoArr);
+            trace('layout.action.cache:', layout.action.cache);
+            trace('layout.action.redoArr:', layout.action.redoArr);
             trace('layerContainer.numChildren:', layerContainer.numChildren);
             for(var i=0; i<data.layers.length; i++){
                 for(var key in data.layers[i]){
