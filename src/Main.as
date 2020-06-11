@@ -416,7 +416,7 @@ public class Main extends Sprite {
 
         var txt:TextField = new TextField();
         txt.border = true;
-        txt.text = 'v1.44';
+        txt.text = 'v1.46';
         txt.width = 80;
         txt.height = 20;
         txt.mouseEnabled = false;

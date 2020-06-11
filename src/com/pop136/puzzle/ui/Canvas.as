@@ -633,6 +633,7 @@ public class Canvas extends Sprite {
                         thumb.link = obj.link;
                         thumb.linkType = obj.linkType;
                         thumb.isLocal = obj.isLocal;
+                        thumb.brand = obj.brand;
                         setTimeout(function () {
                             grid.loadContent(thumb);
                         }, 500);

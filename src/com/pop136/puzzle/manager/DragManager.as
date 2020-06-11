@@ -139,7 +139,7 @@ public class DragManager {
             thumb.id = sourceList.data[i].id;
             thumb.small = sourceList.data[i].small;
             thumb.big = sourceList.data[i].big;
-            thumb.brand = '';
+            thumb.brand = sourceList.data[i].brand;
             thumb.description = '';
             thumb.link = '';
             thumb.linkType = '';

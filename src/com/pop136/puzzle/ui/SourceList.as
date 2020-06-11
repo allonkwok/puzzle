@@ -120,12 +120,12 @@ public class SourceList extends Sprite{
 //                    "{\"id\":2017090601324039, \"small\":\"asset/image/source/2017090601324039.jpg\", \"big\":\"asset/image/source/2017090601324039.jpg\"}," +
 //                    "{\"id\":2017090601324703, \"small\":\"asset/image/source/2017090601324703.jpg\", \"big\":\"asset/image/source/2017090601324703.jpg\"}," +
 //                    "{\"id\":2017090601331756, \"small\":\"asset/image/source/2017090601331756.jpg\", \"big\":\"asset/image/source/2017090601331756.jpg\"}," +
-                    "{\"id\":2017090601332723, \"small\":\"asset/image/source/2017090601332723.jpg\", \"big\":\"asset/image/source/2017090601332723.jpg\"}," +
-                    "{\"id\":2017090601333474, \"small\":\"asset/image/source/2017090601333474.jpg\", \"big\":\"asset/image/source/2017090601333474.jpg\"}," +
-                    "{\"id\":2017090601334336, \"small\":\"asset/image/source/2017090601334336.jpg\", \"big\":\"asset/image/source/2017090601334336.jpg\"}," +
-                    "{\"id\":2017090601335155, \"small\":\"asset/image/source/2017090601335155.jpg\", \"big\":\"asset/image/source/2017090601335155.jpg\"}," +
-                    "{\"id\":2017090601353158, \"small\":\"asset/image/source/2017090601353158.jpg\", \"big\":\"asset/image/source/2017090601353158.jpg\"}," +
-                    "{\"id\":2017090601353749, \"small\":\"asset/image/source/2017090601353749.jpg\", \"big\":\"asset/image/source/2017090601353749.jpg\"}" +
+                    "{\"id\":2017090601332723, \"brand\":\"品牌1\", \"small\":\"asset/image/source/2017090601332723.jpg\", \"big\":\"asset/image/source/2017090601332723.jpg\"}," +
+                    "{\"id\":2017090601333474, \"brand\":\"品牌2\", \"small\":\"asset/image/source/2017090601333474.jpg\", \"big\":\"asset/image/source/2017090601333474.jpg\"}," +
+                    "{\"id\":2017090601334336, \"brand\":\"品牌3\", \"small\":\"asset/image/source/2017090601334336.jpg\", \"big\":\"asset/image/source/2017090601334336.jpg\"}," +
+                    "{\"id\":2017090601335155, \"brand\":\"品牌4\", \"small\":\"asset/image/source/2017090601335155.jpg\", \"big\":\"asset/image/source/2017090601335155.jpg\"}," +
+                    "{\"id\":2017090601353158, \"brand\":\"品牌5\", \"small\":\"asset/image/source/2017090601353158.jpg\", \"big\":\"asset/image/source/2017090601353158.jpg\"}," +
+                    "{\"id\":2017090601353749, \"brand\":\"品牌6\", \"small\":\"asset/image/source/2017090601353749.jpg\", \"big\":\"asset/image/source/2017090601353749.jpg\"}" +
                     "]";
             setSourceList(json);
         }
