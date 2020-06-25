@@ -22,6 +22,7 @@ import flash.net.FileReference;
 import flash.net.URLRequest;
 import flash.text.TextField;
 import flash.text.TextFormat;
+import flash.utils.setTimeout;
 
 import ui.HolderMc;
 
@@ -467,7 +468,9 @@ public class Grid extends Sprite {
     private function onComplete(e:Event):void{
         fr.removeEventListener(Event.COMPLETE, onComplete);
         loader.loadBytes(e.target.data);
-        messager.dispatchEvent(new OperationEvent(OperationEvent.SAVE_OPERATION));
+        setTimeout(function () {
+            messager.dispatchEvent(new OperationEvent(OperationEvent.SAVE_OPERATION));
+        }, 1000);
     }
 
     private function onLoaderComplete(e:Event):void{

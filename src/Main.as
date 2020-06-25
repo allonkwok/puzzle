@@ -58,7 +58,7 @@ public class Main extends Sprite {
 
     private var debugStr:String;
     private static var debugTxt:TextField;
-    private var isDebug:Boolean = false;
+    private var isDebug:Boolean;
     private var topBar:TopBar;
     private var accordion:Accordion;
     private var photoControl:PhotoControl;
@@ -74,7 +74,7 @@ public class Main extends Sprite {
     private var messager:Messager = Messager.getInstance();
 
     public function Main() {
-
+        debug("---------- Main ----------");
         if(ExternalInterface.available){
             var search:String = ExternalInterface.call("function getURL(){return window.location.search;}").split("?")[1];
             var vars:URLVariables = new URLVariables(search);
@@ -82,7 +82,7 @@ public class Main extends Sprite {
             isDebug = Boolean(vars.isDebug) || false;
         }else{
             ServiceManager.site = 1;
-            isDebug = false;
+            isDebug = true;
         }
 
 
@@ -107,8 +107,8 @@ public class Main extends Sprite {
 //            onGetLayoutComplete(event);
 //        })
 
-        var event:ServiceEvent = new ServiceEvent(ServiceEvent.GET_LAYOUT_COMPLETE);
-        onGetLayoutComplete(event);
+//        var event:ServiceEvent = new ServiceEvent(ServiceEvent.GET_LAYOUT_COMPLETE);
+//        onGetLayoutComplete(event);
 
     }
 
@@ -119,9 +119,9 @@ public class Main extends Sprite {
     }
 
     private function setFullScreen(e:ServiceEvent):void{
-        Main.debug(stage.displayState);
+//        Main.debug(stage.displayState);
         if(stage.displayState==StageDisplayState.NORMAL){
-            Main.debug('stage.displayState = StageDisplayState.FULL_SCREEN');
+//            Main.debug('stage.displayState = StageDisplayState.FULL_SCREEN');
             stage.displayState = StageDisplayState.FULL_SCREEN;
         }else{
             stage.displayState = StageDisplayState.NORMAL;
@@ -129,6 +129,7 @@ public class Main extends Sprite {
     }
 
     private function onGetLayoutComplete(e:ServiceEvent):void{
+        debug("---------- Main.onGetLayoutComplete ----------");
         layoutData = e.data;
         ServiceManager.getTemplate();
     }
@@ -179,6 +180,7 @@ public class Main extends Sprite {
             layout.description = accordion.getDescription();
             layout.id = ServiceManager.saveSingleLayout(JSON.stringify(layout));
             PopupManager.showSaveDialog("当前设计版面已保存！");
+            debug(JSON.stringify(layout));
         }else{
             PopupManager.showSaveDialog("没有设计版面，请先创建一个设计版面！");
         }
@@ -254,9 +256,11 @@ public class Main extends Sprite {
                 DataManager.layouts[i].gridSources = sourceList.getSources();
             }
 
+            debug(JSON.stringify(DataManager.layouts));
+
             layoutIndex = 0;
 
-            var isValid = true;
+            var isValid = layout.grids.length > 0;
             for (var i:int = 0; i < layout.grids.length; i++){
                 var grid = layout.grids[i];
                 if(!grid.photo.big || grid.photo.big==''){
@@ -268,8 +272,10 @@ public class Main extends Sprite {
             }
 
             if(isValid){
-                PopupManager.showSaveDialog("正在提交第 " + (layoutIndex+1) + " 张设计", false);
+//                PopupManager.showSaveDialog("正在提交第 " + (layoutIndex+1) + " 张设计", false);
                 var data = DataManager.layouts[layoutIndex];
+                debug("正在提交第 " + (layoutIndex+1) + " 张设计");
+                debug(JSON.stringify(data));
                 layoutImage.draw(data);
             }
 
@@ -297,8 +303,10 @@ public class Main extends Sprite {
         DataManager.layouts[layoutIndex].photo = {id:o.data.id, url:o.data.photo};
         layoutIndex++;
         if(layoutIndex < DataManager.layouts.length){
-            PopupManager.showSaveDialog("正在提交第 " + (layoutIndex+1) + " 张设计", false);
+//            PopupManager.showSaveDialog("正在提交第 " + (layoutIndex+1) + " 张设计", false);
             var data = DataManager.layouts[layoutIndex];
+            debug("正在提交第 " + (layoutIndex+1) + " 张设计");
+            debug(JSON.stringify(data));
             layoutImage.draw(data);
         }else{
             //提交所有版面
@@ -310,7 +318,12 @@ public class Main extends Sprite {
     }
 
     public static function debug(str:String){
-        debugTxt.htmlText += str+"<br>";
+        if(debugTxt){
+            debugTxt.htmlText += str+"<br>";
+        }
+        if(ExternalInterface.available){
+            ExternalInterface.call("console.log", str);
+        }
     }
 
     private function onAddedToStage(e:Event):void{
@@ -405,18 +418,20 @@ public class Main extends Sprite {
 
         debugStr = "";
         debugTxt = new TextField();
-        debugTxt.width = 300;
-        debugTxt.height = 300;
+        debugTxt.width = stage.stageWidth;
+        debugTxt.height = stage.stageHeight;
         debugTxt.border = true;
         debugTxt.mouseEnabled = false;
         debugTxt.htmlText = "";
         debugTxt.multiline = true;
+        debugTxt.wordWrap = true;
+        debugTxt.selectable = true;
         if(isDebug)
             addChild(debugTxt);
 
         var txt:TextField = new TextField();
         txt.border = true;
-        txt.text = 'v1.46';
+        txt.text = 'v2.0.0';
         txt.width = 80;
         txt.height = 20;
         txt.mouseEnabled = false;
@@ -541,9 +556,15 @@ public class Main extends Sprite {
 
     private function onPhotoControlLink(e:PhotoControlEvent):void{
         if(canvas.grid){
+//            debug("onPhotoControlLink canvas.grid");
+//            debug("canvas.grid.brand: " + canvas.grid.brand);
+//            debug("canvas.grid.description: " + canvas.grid.description);
+//            debug("canvas.grid.linkType: " + canvas.grid.linkType);
+//            debug("canvas.grid.link: " + canvas.grid.link);
             PopupManager.showCommonDialog(canvas.grid.brand, canvas.grid.description, canvas.grid.linkType, canvas.grid.link);
         }
         if(canvas.layer){
+//            debug("onPhotoControlLink canvas.layer");
             PopupManager.showCommonDialog(canvas.layer.brand, canvas.layer.description, canvas.layer.linkType, canvas.layer.link);
         }
     }
@@ -615,6 +636,7 @@ public class Main extends Sprite {
         var templateList = new TemplateList();
         templateList.x = templateList.y = 10;
         templateList.addEventListener(TemplateListEvent.CREATE_COMPLETE, function (ee:TemplateListEvent) {
+            debug("---------- Main.TemplateListEvent.CREATE_COMPLETE ----------")
             trace("accordion add content");
             accordion.addContentAt(templateList, 0);
             accordion.addContentAt(layoutWord, 1);
@@ -640,6 +662,7 @@ public class Main extends Sprite {
                 };
                 DataManager.layouts.push(obj);
                 DataManager.layoutTmpId = 1;
+                debug("layoutData==null || layoutData==''");
             }else{
                 var obj = JSON.parse(layoutData);
                 obj.action = {
@@ -659,6 +682,7 @@ public class Main extends Sprite {
                 sourceList.setSourceList(JSON.stringify(obj.gridSources));
                 topBar.tabBtn.visible = false;
                 topBar.setTabName(0, obj.title);
+                debug("layoutData is not empty");
             }
         });
         templateList.addEventListener(TemplateListEvent.CHANGE, function (ee:TemplateListEvent) {
@@ -724,6 +748,9 @@ public class Main extends Sprite {
     }
 
     private function onResize(e:Event):void{
+
+        debugTxt.width = stage.stageWidth;
+        debugTxt.height = stage.stageHeight;
 
         DataManager.stageWidth = stage.stageWidth;
         DataManager.stageHeight = stage.stageHeight;

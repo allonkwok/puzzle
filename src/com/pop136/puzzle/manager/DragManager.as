@@ -139,10 +139,10 @@ public class DragManager {
             thumb.id = sourceList.data[i].id;
             thumb.small = sourceList.data[i].small;
             thumb.big = sourceList.data[i].big;
-            thumb.brand = sourceList.data[i].brand;
+            thumb.brand = sourceList.data[i].brand ? sourceList.data[i].brand : '';
             thumb.description = '';
             thumb.link = '';
-            thumb.linkType = '';
+            thumb.linkType = 0;
             thumb.photoWidth = 0;
             thumb.photoHeight = 0;
             thumb.x = e.stageX;

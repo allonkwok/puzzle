@@ -43,15 +43,15 @@ public class ServiceManager {
     public static function init(){
         if(ExternalInterface.available){
             ExternalInterface.addCallback("setSourceList", function (data:String='') {
-                Main.debug('setSourceList');
+//                Main.debug('setSourceList');
                 messager.dispatchEvent(new ServiceEvent(ServiceEvent.GET_SOURCE_COMPLETE, data));
             });
             ExternalInterface.addCallback("setLayout", function (data:String='') {
-                Main.debug('setLayout');
+//                Main.debug('setLayout');
                 messager.dispatchEvent(new ServiceEvent(ServiceEvent.GET_LAYOUT_COMPLETE, data));
             });
             ExternalInterface.addCallback("setFullScreen", function () {
-                Main.debug('setFullScreen');
+//                Main.debug('setFullScreen');
                 messager.dispatchEvent(new ServiceEvent(ServiceEvent.SET_FULL_SCREEN));
             });
         }

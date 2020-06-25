@@ -275,6 +275,8 @@ public class TopBar extends Sprite{
 
         submitBtn.x = stage.stageWidth-submitBtn.width;
         saveBtn.x = submitBtn.x - saveBtn.width;
+        redoBtn.x = saveBtn.x - redoBtn.width;
+        undoBtn.x = redoBtn.x - undoBtn.width;
     }
 
 }
